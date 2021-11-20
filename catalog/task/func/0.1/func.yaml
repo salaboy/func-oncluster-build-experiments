@@ -1,0 +1,44 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: func-build
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: CLI
+    tekton.dev/tags: cli
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    This Task performs operations using Knative `func` CLI
+
+  params:
+  - name: func-image
+    description: func CLI container image to run this task
+    default: salaboy/func-2e37ecdd2ee11985d861179f5d0a0fbb@sha256:460808f7ea3c58d37767fd24060a14e897e3209c367b4cdf2078bf79795e045d #func built with ko
+  - name: target-registry
+    description: Target registry to publish container images
+    default: grogdj
+  - name: ARGS
+    type: array
+    description: func CLI arguments to run
+    default:
+    - "help"
+  workspaces:
+    - name: output
+      description: The workspace containing the `func` project.  
+  steps:
+  - name: func
+    image: "$(params.func-image)"
+    command: ["func"]
+    args: ["$(params.ARGS)"]
+  - name: results
+    image: "$(params.func-image)"
+    script: |
+        #!/usr/bin/env sh
+        set -eu  
+        printf "%s" "${IMAGE-DIGEST}" > "$(results.IMAGE-DIGEST)" 
+  results:
+    - name: IMAGE-DIGEST
+      description: The precise SHA for the container that was created
