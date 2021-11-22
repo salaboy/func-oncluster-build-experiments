@@ -71,7 +71,9 @@ spec:
       runAfter: [display-results]
       taskRef: 
         name: func-deploy
-      params: 
+      params:
+      - name: path
+        value: "$(workspaces.output.path)$(params.path)" 
       workspaces:
         - name: output
-          workspace: sources  
+          workspace: sources

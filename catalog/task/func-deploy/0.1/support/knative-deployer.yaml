@@ -35,5 +35,5 @@ subjects:
   namespace: default
 roleRef:
   kind: ClusterRole
-  name: knative-deployer
+  name: kn-deployer
   apiGroup: rbac.authorization.k8s.io

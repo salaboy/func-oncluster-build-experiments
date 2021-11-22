@@ -2,9 +2,12 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   creationTimestamp: null
-  name: func-onclusterbuil123d
+  name: func-onclusterbuild-5
   namespace: default
 spec:
+  serviceAccountNames:
+    - taskName: func-deploy
+      serviceAccountName: knative-deployer-account
   podTemplate:
     securityContext:
       fsGroup: 412

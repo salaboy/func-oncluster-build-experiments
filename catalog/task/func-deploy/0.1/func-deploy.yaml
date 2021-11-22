@@ -15,7 +15,9 @@ spec:
   params:
   - name: func-image
     description: func CLI container image to run this task
-    default: salaboy/func-2e37ecdd2ee11985d861179f5d0a0fbb@sha256:4c71dc9c41989df194fe3bb0cab9caacf9beed527fde30ef54a01ad077da612e #func built with `ko publish ./cmd/func`
+    default: salaboy/func-2e37ecdd2ee11985d861179f5d0a0fbb@sha256:33468313582069d2e6ea850cd526858918db215c1bf98558ece2f8967201937f #func built with `ko publish ./cmd/func`
+  - name: path
+    description: path where the function project lives  
   workspaces:
     - name: output
       description: The workspace containing the `func` project.   
@@ -28,5 +30,7 @@ spec:
       - "-v"
       - "-c=false"
       - "-b=false"
+      - "-p"
+      - "$(params.path)"
       
 
