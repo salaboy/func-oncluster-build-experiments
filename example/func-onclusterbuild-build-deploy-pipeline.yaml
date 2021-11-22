@@ -1,0 +1,77 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: func-onclusterbuild-build-deploy-pipeline
+  annotations:
+    description: |
+      Build the a `func` project and deploys it to the cluster
+spec:
+  params:
+    - name: gitRepository
+      description: The git repository that hosts the `func` project
+      default: https://github.com/salaboy/dad-vibes-functions
+    - name: gitRevision
+      description: The git revision to build
+      default: main
+    - name: path
+      description: path where the func project is
+      default: "/"
+    - name: registry
+      description: registry where the func container image will be pushed
+      default: "docker.io/grogdj"  
+  workspaces:
+    - name: cache
+      description: buildpacks-cache
+    - name: sources
+      description: Workspace where the git repo is prepared for building
+    - name: dockerconfig
+      description: Docker config secret
+  tasks:
+    - name: clone-repo
+      taskRef:
+        name: git-clone
+        bundle: gcr.io/tekton-releases/catalog/upstream/git-clone:0.5
+      params:
+        - name: url
+          value: $(params.gitRepository)
+        - name: revision
+          value: $(params.gitRevision)
+      workspaces:
+        - name: output
+          workspace: sources
+    - name: func-build
+      runAfter: [clone-repo]
+      taskRef: 
+        name: func-build
+      params: 
+      - name: path
+        value: "$(workspaces.output.path)$(params.path)"
+      - name: registry
+        value: "$(params.registry)"    
+      workspaces:
+        - name: output
+          workspace: sources  
+    - name: display-results
+      runAfter:
+        - func-build
+      taskSpec:
+        steps:
+          - name: print
+            image: docker.io/library/bash:5.1.4@sha256:b208215a4655538be652b2769d82e576bc4d0a2bb132144c060efc5be8c3f5d6
+            script: |
+              #!/usr/bin/env bash
+              set -e
+              echo "Digest of created app image: $(params.DIGEST)"              
+        params:
+          - name: DIGEST
+      params:
+        - name: DIGEST
+          value: $(tasks.func-build.results.APP_IMAGE_DIGEST)
+    - name: func-deploy
+      runAfter: [display-results]
+      taskRef: 
+        name: func-deploy
+      params: 
+      workspaces:
+        - name: output
+          workspace: sources  

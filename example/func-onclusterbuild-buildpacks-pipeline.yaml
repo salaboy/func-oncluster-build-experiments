@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: func-pipeline
+  name: func-onclusterbuild-buildpacks-pipeline
   annotations:
     description: |
       Build the a `func` project and deploys it to the cluster

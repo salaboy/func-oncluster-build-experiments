@@ -1,0 +1,34 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: func-onclusterbuil123d
+  namespace: default
+spec:
+  podTemplate:
+    securityContext:
+      fsGroup: 412
+  params:
+  - name: gitRepository
+    value: https://github.com/salaboy/dad-vibes-functions
+  - name: gitRevision
+    value: main
+  - name: path
+    value: /
+  - name: registry
+    value: docker.io/grogdj
+  pipelineRef:
+    name: func-onclusterbuild-build-deploy-pipeline
+  serviceAccountName: dockerconfig
+  workspaces:
+  - name: sources
+    persistentVolumeClaim:
+      claimName: source-pvc
+    subPath: source
+  - name: cache
+    persistentVolumeClaim:
+      claimName: source-pvc
+    subPath: cache
+  - name: dockerconfig
+    secret:
+      secretName: regcred

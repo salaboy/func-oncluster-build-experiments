@@ -16,8 +16,6 @@ spec:
   - name: func-image
     description: func CLI container image to run this task
     default: salaboy/func-2e37ecdd2ee11985d861179f5d0a0fbb@sha256:4c71dc9c41989df194fe3bb0cab9caacf9beed527fde30ef54a01ad077da612e #func built with `ko publish ./cmd/func`
-  - name: image-sha
-    description: Target container image that needs to be run
   workspaces:
     - name: output
       description: The workspace containing the `func` project.   
@@ -28,10 +26,7 @@ spec:
     args: 
       - "deploy"
       - "-v"
-      - "-i"
-      - "$(params.image-sha)"
-      - "-c"
-      - "false"
-      - "-b"
-      - "false"
+      - "-c=false"
+      - "-b=false"
+      
 
