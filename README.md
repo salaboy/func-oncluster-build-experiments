@@ -16,6 +16,8 @@ The objective of this experiment is to enable users to build func projects in a 
 
 - [Tekton Buildpacks Task](https://github.com/tektoncd/catalog/tree/main/task/buildpacks/0.3)
 
+- [Tekton Buildpacks Task Example](https://buildpacks.io/docs/tools/tekton/)
+
 -[Tekton `kn` Task](https://github.com/tektoncd/catalog/blob/main/task/kn/0.1/kn.yaml)
 
 - https://github.com/evankanderson/springone-2021-knative-tekton/blob/main/knative-install/buildpack-pipeline.yaml

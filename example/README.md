@@ -35,7 +35,7 @@ kubectl apply -f examples/func-on-cluster-build-pipeline.yaml
 You can now create new instances of this pipeline by running: 
 
 ```
-tkn pipeline start func-pipeline -s dockerconfig -w name=sources,volumeClaimTemplateFile=workspace-template.yaml -w name=dockerconfig,secret=regcred
+tkn pipeline start func-pipeline -s dockerconfig -w name=sources,claimName=source-pvc,subPath=source -w name=cache,claimName=source-pvc,subPath=cache -w name=dockerconfig,secret=regcred
 
 ```
 

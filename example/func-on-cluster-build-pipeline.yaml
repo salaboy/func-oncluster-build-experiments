@@ -13,25 +13,16 @@ spec:
     - name: gitRevision
       description: The git revision to build
       default: main
-    - name: target
-      description: The target container registry and path where to build the image
-      default: grogdj
     - name: target-name
       description: Name of the image to publish
-      default: dad-vibes
-    - name: version
-      description: the target version to build
-      default: 0.1.0-on-cluster
+      default: docker.io/grogdj/dad-vibes-functions
   workspaces:
+    - name: cache
+      description: buildpacks-cache
     - name: sources
       description: Workspace where the git repo is prepared for building
     - name: dockerconfig
       description: Docker config secret
-  results:
-    - name: cd.artifact.name
-      value: $(tasks.export-results.results.artifactName)
-    - name: cd.artifact.version
-      value: $(tasks.export-results.results.artifactVersion)
   tasks:
     - name: clone-repo
       taskRef:
@@ -45,46 +36,45 @@ spec:
       workspaces:
         - name: output
           workspace: sources
-    - name: func-build
+    - name: buildpacks # This task uses the `buildpacks` task to build the application
+      taskRef:
+        name: buildpacks
       runAfter: [clone-repo]
+      workspaces:
+        - name: source
+          workspace: sources
+        - name: cache
+          workspace: sources
+      params:
+        - name: APP_IMAGE
+          value: "$(params.target-name)"
+        - name: SOURCE_SUBPATH
+          value: "/" # This is the path within the samples repo you want to build (OPTIONAL, default: "")
+        - name: BUILDER_IMAGE
+          value: paketobuildpacks/builder:tiny # This is the builder we want the task to use (REQUIRED)      
+    - name: display-results
+      runAfter:
+        - buildpacks
+      taskSpec:
+        steps:
+          - name: print
+            image: docker.io/library/bash:5.1.4@sha256:b208215a4655538be652b2769d82e576bc4d0a2bb132144c060efc5be8c3f5d6
+            script: |
+              #!/usr/bin/env bash
+              set -e
+              echo "Digest of created app image: $(params.DIGEST)"              
+        params:
+          - name: DIGEST
+      params:
+        - name: DIGEST
+          value: $(tasks.buildpacks.results.APP_IMAGE_DIGEST)
+    - name: func-deploy
+      runAfter: [display-results]
       taskRef: 
-        name: func-build
-      params:  
-      - name: ARGS
-        value: 
-        - "build"
-        - "-r"
-        - ${params.target}
-        - "-v" 
-        - "-p"
-        - "$(workspaces.output.path)/"
+        name: func-deploy
+      params: 
+      - name: image-sha
+        value: "$(params.target-name):$(tasks.buildpacks.results.APP_IMAGE_DIGEST)"
       workspaces:
         - name: output
           workspace: sources  
-    - name: export-results
-      runAfter: [func-build]
-      taskSpec:
-        params:
-          - name: name
-          - name: version
-        results:
-          - name: artifactName
-            description: The name of the artifact
-          - name: artifactVersion
-            description: The version of the artifact
-        steps:
-          - name: create-results
-            image: alpine
-            env:
-              - name: ARTIFACT_NAME_RESULT_VALUE
-                value: $(params.name)
-              - name: ARTIFACT_VERSION_RESULT_VALUE
-                value: $(params.version)
-            script: |
-              printf "$ARTIFACT_NAME_RESULT_VALUE" > "$ARTIFACT_NAME_RESULT_PATH"
-              printf "$ARTIFACT_VERSION_RESULT_VALUE" > "$ARTIFACT_VERSION_RESULT_PATH"
-      params:
-        - name: name
-          value: $(params.target-name)
-        - name: version
-          value: $(params.version)
