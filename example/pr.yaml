@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   creationTimestamp: null
-  name: func-onclusterbuild-5
+  name: func-onclusterbuild-1
   namespace: default
 spec:
   serviceAccountNames:

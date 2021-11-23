@@ -13,7 +13,6 @@ To accomplish this, we will install a `func` as two Tekton Tasks and we will use
 - Use `func deploy` to deploy the `func` project to the Cluster. 
 
 
-
 Another approach ([func-onclusterbuild-buildpacks-pipeline.yaml](example/func-onclusterbuild-buildpacks-pipeline.yaml)) would be to use the Buildpacks Tekton Task and have a pipeline that do: 
 - Clone Repository from Github
 - Use buildpack task to build the function project
@@ -21,6 +20,8 @@ Another approach ([func-onclusterbuild-buildpacks-pipeline.yaml](example/func-on
 - Use `func deploy` to deploy the function in the cluster
 
 ![Pipelines](func-on-cluster-pipeline.png)
+
+The pipelines are trying to build a `func` project hosted in this repository: [https://github.com/salaboy/dad-vibes-functions](https://github.com/salaboy/dad-vibes-functions)
 
 ## Notes
 
@@ -38,7 +39,7 @@ Another approach ([func-onclusterbuild-buildpacks-pipeline.yaml](example/func-on
 
 ## Installing `func` Tekton resources
 
-This repository define two Custom Tekton Tasks `func build` and `func deploy` to install them you can run:  
+This repository define two Custom Tekton Tasks [`func build`](catalog/task/func-build/0.1) and [`func deploy`](catalog/task/func-deploy/0.1) to install them you can run:  
 
 ```
 kubectl apply --recursive -f catalog/task/
@@ -54,6 +55,13 @@ I've built this Docker image by running:
 `ko publish ./cmd/func`
 ```
 
+I used the following `.ko.yaml`:
+
+```
+defaultBaseImage: gcr.io/distroless/static:nonroot
+baseImageOverrides:
+  knative.dev/kn-plugin-func/cmd/func: docker.io/library/alpine:latest
+```
 
 `func` will need to have your docker registry credentials to be able to push the produces container image to a public registry. 
 
@@ -63,7 +71,6 @@ kubectl create secret docker-registry regcred --docker-server=https://index.dock
 ```
 
 You can now install the example pipeline with and a required PVC for sources and cache:
-
 
 ```
 kubectl apply -f examples/pvc.yaml
@@ -83,7 +90,6 @@ kubectl apply -f examples/pr.yaml
 tkn pipeline start func-pipeline -s dockerconfig -w name=sources,claimName=source-pvc,subPath=source -w name=cache,claimName=source-pvc,subPath=cache -w name=dockerconfig,secret=regcred
 
 ```
-
 
 
 ## References
