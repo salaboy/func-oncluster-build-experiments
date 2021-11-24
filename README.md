@@ -107,10 +107,10 @@ tkn pipeline start func-pipeline -s dockerconfig -w name=sources,claimName=sourc
 
 - [Tekton Buildpacks Task Example](https://buildpacks.io/docs/tools/tekton/)
 
--[Tekton `kn` Task](https://github.com/tektoncd/catalog/blob/main/task/kn/0.1/kn.yaml)
+- [Tekton `kn` Task](https://github.com/tektoncd/catalog/blob/main/task/kn/0.1/kn.yaml)
 
-- https://github.com/evankanderson/springone-2021-knative-tekton/blob/main/knative-install/buildpack-pipeline.yaml
+- [Evan's pipelines for SpringOne](https://github.com/evankanderson/springone-2021-knative-tekton/blob/main/knative-install/buildpack-pipeline.yaml)
 
-- https://github.com/cdfoundation/sig-events/tree/main/poc/tekton 
+- [CDFoundation SIG Events setup for Tekton](https://github.com/cdfoundation/sig-events/tree/main/poc/tekton)
 
  
