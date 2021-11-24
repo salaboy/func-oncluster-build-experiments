@@ -23,13 +23,15 @@ Another approach ([func-onclusterbuild-buildpacks-pipeline.yaml](example/func-on
 
 The pipelines are trying to build a `func` project hosted in this repository: [https://github.com/salaboy/dad-vibes-functions](https://github.com/salaboy/dad-vibes-functions)
 
-## Notes
+## Notes / Issues
 
+- I needed to hack func in order to produce the `func` container image because I was hitting a "Not initialized" function issue caused by a missing Created field in the `func.yaml` file. @kingland mentioned in slack that this is fixed here: [https://github.com/knative-sandbox/kn-plugin-func/pull/664](https://github.com/knative-sandbox/kn-plugin-func/pull/664)
 - It will be great if `func build` and `func deploy` can be parameterized to not need the `func.yaml` file, so for example the pipeline can just use the SHA of the image to do the deploy
   - Also this avoids the commands writing back info in the `func.yaml` file
-- The buildpacks pipeline is still WIP, not sure if it is worth it
 - It will be interesting to define remote build and remote deploy.. so you can choose what to do where. 
+- Is there any reason why `func build` doesn't do the push of the produced image? This logic of "push" is now defined inside `func deploy` which doesn't make much sense if we are trying to split responsabilities for the pipeline tasks. [https://github.com/knative-sandbox/kn-plugin-func/issues/676](https://github.com/knative-sandbox/kn-plugin-func/issues/676)
 
+- The buildpacks pipeline is still WIP, not sure if it is worth it (we decided that is not the favourite option in the WG meeting) 
 
 ## Pre Requistes
 - Kubernetes Cluster
@@ -111,11 +113,4 @@ tkn pipeline start func-pipeline -s dockerconfig -w name=sources,claimName=sourc
 
 - https://github.com/cdfoundation/sig-events/tree/main/poc/tekton 
 
-# TODO's (internal)
-
-- Check approach:
- - Do I need to use func build + func deploy or 
- - if it is better to do buildpacks task + func deploy
-
- I should retest func build in the pipeline as now the buildpacks task is working correctly and producing the correct image. 
  
