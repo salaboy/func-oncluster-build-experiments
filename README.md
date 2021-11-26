@@ -75,15 +75,15 @@ kubectl create secret docker-registry regcred --docker-server=https://index.dock
 You can now install the example pipeline with and a required PVC for sources and cache:
 
 ```
-kubectl apply -f examples/pvc.yaml
-kubectl apply -f examples/func-onclusterbuild-build-deploy-pipeline.yaml
+kubectl apply -f example/pvc.yaml
+kubectl apply -f example/func-onclusterbuild-build-deploy-pipeline.yaml
 
 ```
 
 You can now create new instances of this pipeline by running: 
 
 ```
-kubectl apply -f examples/pr.yaml
+kubectl apply -f example/pr.yaml
 ```
 
 **Note**: I am using a `PipelineRun` because I need to set up a ServiceAccount for Build and another one for Deploy, and I haven't found the way to do it using `tkn`
